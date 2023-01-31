@@ -1,5 +1,7 @@
 use super::*;
 
+use crate::ui::fonts::Glyph;
+
 pub const WIDTH: i32 = 600;
 pub const HEIGHT: i32 = 800;
 
@@ -38,4 +40,22 @@ impl Canvas {
     }
     for i in  0..w { self.put(Pos(x + i, y + h - 1), color); }
   }
+
+  pub fn draw_glyph(&mut self, glyph: &Glyph, pos: Pos) -> u16 {
+    let mut idx = 0;
+    let Pos(xpos, ypos) = pos;
+    for col in 0..glyph.metrics.height {
+      for line in 0..glyph.metrics.width {
+        self.put(
+          Pos(
+            line as u16 + (xpos as i32 + glyph.metrics.xmin) as u16, 
+            (ypos as i32 + col as i32 - (glyph.metrics.height as i32 + glyph.metrics.ymin)) as u16
+          ), 
+          255 - glyph.data[idx]);
+        idx = idx + 1;
+      }
+    }
+    (xpos as f32 + glyph.metrics.advance_width) as u16
+  }
+  
 }

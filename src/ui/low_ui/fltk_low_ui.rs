@@ -105,6 +105,10 @@ impl LowUi for FLTKLowUi  {
     self.canvas.borrow_mut().put(pos, color);
   }
 
+  fn draw_glyph(&self, glyph: &Glyph, pos: Pos) -> u16 {
+    self.canvas.borrow_mut().draw_glyph(glyph, pos)
+  }
+
   fn redraw(&self) {
     self.frame.borrow_mut().redraw();
   }

@@ -5,54 +5,31 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::low_ui::{*, fltk_low_ui::FLTKLowUi};
+use ui::fonts::{FontEntry, FaceStyle};
 
 fn test_input_handler(event: Event) {
   println!("test_input_handler called back with event {event:?}");
 }
 
-use fontdue::Metrics;
+use utils::errors::InternalError;
 
-fn show_char(ui: &Rc<RefCell<FLTKLowUi>>, xpos: u16, metrics: Metrics, bitmap: Vec<u8>) -> u16 {
-  let mut idx = 0;
-  for j in 0..metrics.height {
-    for i in 0..metrics.width {
-      ui.borrow().draw_pixel(
-        Pos(
-          i as u16 + (xpos as i32 + metrics.xmin) as u16, 
-          (50 + j as i32 - (metrics.height as i32 + metrics.ymin)) as u16
-        ), 
-        255 - bitmap[idx]);
-      idx = idx + 1;
-      // print!("{} ", bitmap[j * metrics.width + i]);
-    }
-    // println!("");
-  }
-  (xpos as f32 + metrics.advance_width) as u16
-}
-
-fn font_test(ui: &Rc<RefCell<FLTKLowUi>>) {
+fn font_test(ui: &Rc<RefCell<FLTKLowUi>>) -> Result<(), InternalError> {
   // Read the font data.
-  let font = include_bytes!("../fonts/AbyssinicaSIL-Regular.ttf") as &[u8];
-  // Parse it into the font type.
-  let font = fontdue::Font::from_bytes(font, fontdue::FontSettings::default()).unwrap();
+  let font_entry = FontEntry::new_from_file(
+    "AbyssinicaSIL".to_string(), 
+    &"fonts/AbyssinicaSIL-Regular.ttf".to_string(),
+    FaceStyle::Normal)?;
+
   let mut xpos = 0;
-  let mut last_ch = ' ';
   for c in "VAijgficxVM".chars() {
-    let (metrics, bitmap) = font.rasterize(c, 24.0);
-    //println!("Metrics: {:?}", metrics);
-    xpos = show_char(ui, xpos, metrics, bitmap);
-    if last_ch != ' ' {
-      if let Some(kern) = font.horizontal_kern(last_ch, c, 24.0) {
-        println!("Kerning between {} and {}: {}", last_ch, c, kern);
-      }
-    }
-    last_ch = c;
+    let glyph = font_entry.get_glyph(c, 24.0);
+    xpos = ui.borrow().draw_glyph(&glyph, Pos(xpos, 50));
   }
-  for c in "VaijgficxVM".chars() {
-    let (metrics, bitmap) = font.rasterize(c, 40.0);
-    //println!("Metrics: {:?}", metrics);
-    xpos = show_char(ui, xpos, metrics, bitmap);
+  for c in "VAijgficxVM".chars() {
+    let glyph = font_entry.get_glyph(c, 40.0);
+    xpos = ui.borrow().draw_glyph(&glyph, Pos(xpos, 50));
   }
+  Ok(())
 }
 
 fn main() {
@@ -67,7 +44,7 @@ fn main() {
     }
   };
 
-  font_test(&ui);
+  font_test(&ui).unwrap();
 
   ui.borrow().subscribe(f, Event::Click(0, 0));
   

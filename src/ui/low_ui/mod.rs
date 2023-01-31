@@ -4,6 +4,7 @@ pub mod fltk_low_ui;
 mod canvas;
 
 use derivative::Derivative;
+use super::fonts::Glyph;
 
 #[derive(Debug, Eq, Copy, Clone, Derivative)]
 #[derivative(Hash, PartialEq)]
@@ -27,11 +28,18 @@ pub type Color = u8;
 pub const BLACK : u8 = 0x00;
 pub const WHITE : u8 = 0xFF;
 
+pub struct Bitmap {
+  data: Vec<u8>,
+  dim: Dim,
+  stride: u16,
+}
+
 pub trait LowUi {
   fn new() -> Self;
   fn run(&self);
   fn subscribe(&self, listener: impl Fn(Event) + 'static, event_type: Event);
   fn draw_rectangle(&self, pos: Pos, dim: Dim, color: Color);
   fn draw_pixel(&self, pos: Pos, color: Color);
+  fn draw_glyph(&self, glyph: &Glyph, pos: Pos) -> u16;
   fn redraw(&self);
 }
