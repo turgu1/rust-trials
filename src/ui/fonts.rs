@@ -27,7 +27,7 @@ pub struct FontEntry {
 
 impl FontEntry {
 
-  pub fn new_from_memory(name: String, font_data: &[u8], face_style: FaceStyle) -> Result<Self, InternalError> {
+  fn new_from_memory(name: String, font_data: &[u8], face_style: FaceStyle) -> Result<Self, InternalError> {
     if let Ok(font) = fontdue::Font::from_bytes(font_data, fontdue::FontSettings::default()) {
       Ok(Self {
         name,
@@ -36,17 +36,17 @@ impl FontEntry {
       })
     }
     else {
-      Err(InternalError::SomeError("fontdue: font format not compatible", name.to_string()))
+      Err(InternalError::SomeError("fontdue: font format not compatible", name))
     }
   }
 
-  pub fn new_from_file(name: String, filename: &String, face_style: FaceStyle) -> Result<Self, InternalError> {
+  fn new_from_file(name: String, filename: &String, face_style: FaceStyle) -> Result<Self, InternalError> {
     let font_data = fs::read(filename)?;
     FontEntry::new_from_memory(name, &font_data, face_style)
   }
 
   pub fn get_glyph(&self, character: char, px: f32) -> Glyph {
-    let (metrics, data) = self.font.rasterize(character, 24.0);
+    let (metrics, data) = self.font.rasterize(character, px);
     Glyph {
       metrics,
       data,
@@ -55,5 +55,35 @@ impl FontEntry {
 
   pub fn get_glyph_metrics(&self, character: char, px: f32) -> Metrics {
     self.font.metrics(character, px)
+  }
+}
+
+pub struct Fonts {
+  font_entries: Vec<FontEntry>,
+}
+
+impl Fonts {
+  pub fn new() -> Self {
+    Self {
+      font_entries : Vec::new(),
+    }
+  }
+
+  pub fn get(&self, index: usize) -> Result<&FontEntry, InternalError> {
+    if let Some(f) = self.font_entries.get(index) { Ok(f) }
+    else if let Some(f) = self.font_entries.get(1) { Ok(f) }
+    else {
+      Err(InternalError::SomeError("Fonts::get(): Wrong index: {}", index.to_string()))
+    }
+  }
+
+  pub fn add_from_file(&mut self, name: String, filename: &String, face_style: FaceStyle) -> Result<&FontEntry, InternalError> {
+    self.font_entries.push(FontEntry::new_from_file(name, filename, face_style)?);
+    Ok(self.font_entries.last().unwrap())
+  }
+
+  pub fn add_from_memory(&mut self, name: String, font_data: &[u8], face_style: FaceStyle) -> Result<&FontEntry, InternalError> {
+    self.font_entries.push(FontEntry::new_from_memory(name, font_data, face_style)?);
+    Ok(self.font_entries.last().unwrap())
   }
 }

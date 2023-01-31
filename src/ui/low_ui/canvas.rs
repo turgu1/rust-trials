@@ -52,7 +52,7 @@ impl Canvas {
             (ypos as i32 + col as i32 - (glyph.metrics.height as i32 + glyph.metrics.ymin)) as u16
           ), 
           255 - glyph.data[idx]);
-        idx = idx + 1;
+        idx += 1;
       }
     }
     (xpos as f32 + glyph.metrics.advance_width) as u16
