@@ -2,8 +2,8 @@ use super::*;
 
 use crate::ui::fonts::Glyph;
 
-pub const WIDTH: i32 = 600;
-pub const HEIGHT: i32 = 800;
+const WIDTH: u16 = 600;
+const HEIGHT: u16 = 800;
 
 pub struct Canvas {
   pub frame_buffer: Vec<u8>
@@ -12,15 +12,21 @@ pub struct Canvas {
 impl Canvas {
   pub fn new() -> Self {
     Self {
-      frame_buffer: vec![255; (WIDTH * HEIGHT * 4) as usize]
+      frame_buffer: vec![255; WIDTH as usize * HEIGHT as usize * 4]
     }
   }
+
+  #[inline]
+  pub fn get_width(&self) -> u16 { WIDTH }
+
+  #[inline]
+  pub fn get_height(&self) -> u16 { HEIGHT }
 
   pub fn put(&mut self, pos: Pos, color: Color) {
     if color != WHITE {
       let Pos(x, y) = pos;
       if (x < WIDTH as u16) && (y < HEIGHT as u16) {
-        let idx = (((y as i32 * WIDTH) + x as i32) * 4) as usize;
+        let idx = ((y as usize * WIDTH as usize) + x as usize) * 4;
         self.frame_buffer[idx    ] = color;
         self.frame_buffer[idx + 1] = color;
         self.frame_buffer[idx + 2] = color;

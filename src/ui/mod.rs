@@ -1,5 +1,6 @@
 pub mod low_ui;
 pub mod fonts;
+pub mod display_list;
 
 use std::rc::Rc;
 use std::cell::RefCell;

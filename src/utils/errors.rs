@@ -10,5 +10,8 @@ pub enum InternalError {
   FileError(#[from] std::io::Error),
 
   #[error("error: {0}")]
-  SomeError(&'static str, String),
+  StrError(&'static str),
+
+  #[error("error: {0}")]
+  StringError(String),
 }

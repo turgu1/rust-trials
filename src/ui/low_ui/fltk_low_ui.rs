@@ -19,7 +19,7 @@ use crate::utils::observer::Publisher;
 
 use std::cell::RefCell;
 
-const GAP:  i32 = 10;
+const GAP: i32 = 10;
 
 pub struct FLTKLowUi {
   app: Application,
@@ -34,11 +34,11 @@ impl FLTKLowUi {
     let (sender, receiver) = channel::<Event>();
   
     let mut window =  Window::default()
-      .with_size(WIDTH + GAP*2, HEIGHT + GAP*2)
+      .with_size(canvas.borrow().get_width() as i32 + GAP * 2, canvas.borrow().get_height() as i32 + GAP * 2)
       .with_label("FLTK Trial");
   
     let frame = RefCell::new(Frame::default()
-      .with_size(WIDTH, HEIGHT)
+      .with_size(canvas.borrow().get_width() as i32, canvas.borrow().get_height() as i32)
       .with_pos(GAP, GAP));
 
     // let mut boo_button = Button::default()

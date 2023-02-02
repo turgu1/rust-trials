@@ -5,7 +5,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::low_ui::{*, fltk_low_ui::FLTKLowUi};
-use ui::fonts::{Fonts, FaceStyle};
+use ui::fonts::Fonts;
 
 fn test_input_handler(event: Event) {
   println!("test_input_handler called back with event {event:?}");
@@ -15,11 +15,10 @@ use utils::errors::InternalError;
 
 fn font_test(ui: &Rc<RefCell<FLTKLowUi>>) -> Result<(), InternalError> {
   let mut fonts = Fonts::new();
+  fonts.setup()?;
+
   // Read the font data.
-  let font_entry = fonts.add_from_file(
-    "AbyssinicaSIL".to_string(), 
-    &"fonts/AbyssinicaSIL-Regular.ttf".to_string(),
-    FaceStyle::Normal)?;
+  let font_entry = fonts.get_font_at_index(0);
 
   let mut xpos = 0;
   for c in "VAijgficxVM".chars() {
