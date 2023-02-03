@@ -22,11 +22,11 @@ fn font_test(ui: &Rc<RefCell<FLTKLowUi>>) -> Result<(), InternalError> {
 
   let mut xpos = 0;
   for c in "VAijgficxVM".chars() {
-    let glyph = font_entry.get_glyph(c, 24.0);
+    let glyph = font_entry.get_glyph(c, 24.0, true);
     xpos = ui.borrow().draw_glyph(&glyph, Pos(xpos, 50));
   }
   for c in "VAijgficxVM".chars() {
-    let glyph = font_entry.get_glyph(c, 40.0);
+    let glyph = font_entry.get_glyph(c, 40.0, true);
     xpos = ui.borrow().draw_glyph(&glyph, Pos(xpos, 50));
   }
   Ok(())

@@ -1,6 +1,4 @@
-#![allow(dead_code)]
-#![allow(unused)]
-#![feature(try_find)]
+#![allow(dead_code, unused)]
 
 use std::fs;
 
@@ -20,7 +18,7 @@ pub enum FaceStyle {
 
 pub struct Glyph {
   pub metrics: Metrics,
-  pub data: Vec<u8>,
+  pub raster: Option<Vec<u8>>,
 }
 
 pub struct FontEntry {
@@ -49,11 +47,20 @@ impl FontEntry {
     FontEntry::new_from_memory(name, &font_data, face_style)
   }
 
-  pub fn get_glyph(&self, character: char, px: f32) -> Glyph {
-    let (metrics, data) = self.font.rasterize(character, px);
-    Glyph {
-      metrics,
-      data,
+  pub fn get_glyph(&self, character: char, px: f32, with_raster: bool) -> Glyph {
+    if with_raster {
+      let (metrics, raster) = self.font.rasterize(character, px);
+      Glyph {
+        metrics,
+        raster: Some(raster),
+      }
+    }
+    else {
+      let metrics = self.font.metrics(character, px);
+      Glyph {
+        metrics,
+        raster: None,
+      }
     }
   }
 

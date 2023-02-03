@@ -50,18 +50,23 @@ impl Canvas {
   pub fn draw_glyph(&mut self, glyph: &Glyph, pos: Pos) -> u16 {
     let mut idx = 0;
     let Pos(xpos, ypos) = pos;
-    for col in 0..glyph.metrics.height {
-      for line in 0..glyph.metrics.width {
-        self.put(
-          Pos(
-            line as u16 + (xpos as i32 + glyph.metrics.xmin) as u16, 
-            (ypos as i32 + col as i32 - (glyph.metrics.height as i32 + glyph.metrics.ymin)) as u16
-          ), 
-          255 - glyph.data[idx]);
-        idx += 1;
-      }
+    match glyph.raster {
+      Some(ref raster) => {
+        for col in 0..glyph.metrics.height {
+          for line in 0..glyph.metrics.width {
+            self.put(
+              Pos(
+                line as u16 + (xpos as i32 + glyph.metrics.xmin) as u16, 
+                (ypos as i32 + col as i32 - (glyph.metrics.height as i32 + glyph.metrics.ymin)) as u16
+              ), 
+              255 - raster[idx]);
+            idx += 1;
+          }
+        }
+      },
+      None => ()
     }
-    (xpos as f32 + glyph.metrics.advance_width) as u16
+    
+    return (xpos as f32 + glyph.metrics.advance_width) as u16
   }
-  
 }

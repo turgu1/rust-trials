@@ -20,7 +20,9 @@ pub enum Event {
   Nothing,
 }
 
+#[derive(Default)]
 pub struct Pos(pub u16, pub u16);
+#[derive(Default)]
 pub struct Dim(pub u16, pub u16);
 
 pub type Color = u8;
